@@ -44,9 +44,9 @@ export class AuthController {
       throw new BadRequestException('User with this email already exists');
     }
 
-    const foundUser = await this.userService.create(registerUserDto);
+    const createdUser = await this.userService.create(registerUserDto);
 
-    return foundUser;
+    return createdUser;
   }
 
   // @Get('profile')

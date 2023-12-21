@@ -62,16 +62,12 @@ export class AuthService {
     ) {
       throw new UnauthorizedException('The password is incorrect');
     } else {
-      console.log('mil gaya');
-
       return findUser;
     }
   }
 
   private getTokenOptions() {
     const jwtSecret = process.env.JWT_SECRET;
-
-    console.log('kya hai login secret?', jwtSecret);
 
     const options: JwtSignOptions = {
       secret: `${jwtSecret}`,

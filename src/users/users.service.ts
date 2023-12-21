@@ -17,9 +17,16 @@ export class UsersService {
 
   async findUserEmail(@Body() email: string): Promise<User> {
     try {
-      const findUser = this.userModel.findOne({ email: email });
+      const findUser = await this.userModel.findOne({ email: email });
+
+      if (!findUser) {
+        // throw new NotFoundException('No user found using this email');
+        return null;
+      }
 
       return sanitiseUser(findUser);
+
+      // return false;
     } catch (error) {
       throw new NotFoundException('No user found using this email');
     }
@@ -29,12 +36,8 @@ export class UsersService {
     try {
       const findUser = await this.userModel.find().exec();
 
-      console.log({ findUser });
-
       return sanitiseAllUsers(findUser);
     } catch (error) {
-      console.log(error);
-
       throw new NotFoundException('Kuch nahi mila');
     }
   }

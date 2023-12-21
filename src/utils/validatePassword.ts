@@ -7,5 +7,5 @@ export async function validatePassword({
   stored: string;
   provided: string;
 }): Promise<boolean> {
-  return bcrypt.compare(provided || '', stored);
+  return bcrypt.compare(provided, stored);
 }

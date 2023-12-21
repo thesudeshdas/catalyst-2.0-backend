@@ -27,14 +27,10 @@ export class AuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
-      console.log('here or wot?');
-
       throw new UnauthorizedException('No token here');
     }
     try {
       const jwtSecret = process.env.JWT_SECRET;
-
-      console.log({ jwtSecret });
 
       const payload = await this.jwtService.verifyAsync(token, {
         secret: jwtSecret,
@@ -42,8 +38,6 @@ export class AuthGuard implements CanActivate {
 
       request['user'] = payload;
     } catch (err) {
-      console.log('is it here?', err);
-
       throw new UnauthorizedException();
     }
     return true;
