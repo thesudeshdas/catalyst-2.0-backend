@@ -2,24 +2,18 @@ import {
   BadRequestException,
   Body,
   Controller,
-  Get,
   HttpCode,
   HttpStatus,
   Post,
-  Request,
   UsePipes,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
 import { User } from 'src/schema/users.schema';
 import { UsersService } from 'src/users/users.service';
-import {
-  LoginUserDto,
-  RegisterUserDto,
-  loginUserSchema,
-  registerUserSchema,
-} from './auth.dto';
+import { LoginUserDto, RefreshTokensDto, loginUserSchema } from './auth.dto';
 import { ZodValidationPipe } from 'src/utils/zodValidationPipe';
+import { RegisterUserDto, registerUserSchema } from 'src/users/users.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -47,6 +41,14 @@ export class AuthController {
     const createdUser = await this.userService.create(registerUserDto);
 
     return createdUser;
+  }
+
+  @Public()
+  @Post('refresh')
+  async refreshTokens(
+    @Body() refreshTokensDto: RefreshTokensDto,
+  ): Promise<any> {
+    return this.authService.refreshTokens(refreshTokensDto.refreshToken);
   }
 
   // @Get('profile')

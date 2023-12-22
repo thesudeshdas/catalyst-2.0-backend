@@ -4,10 +4,15 @@ import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private userService: UsersService) {}
+  constructor(private usersService: UsersService) {}
 
   @Get('check')
   getAllUsers(): Promise<User[]> {
-    return this.userService.findAll();
+    return this.usersService.findAll();
+  }
+
+  @Get()
+  findAll() {
+    return this.usersService.findAll();
   }
 }

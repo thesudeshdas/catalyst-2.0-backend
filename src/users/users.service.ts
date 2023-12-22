@@ -1,44 +1,43 @@
-import { Body, Injectable, NotFoundException } from '@nestjs/common';
+import { Body, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from 'src/schema/users.schema';
-import { RegisterUserDto } from 'src/auth/auth.dto';
-import { sanitiseAllUsers, sanitiseUser } from 'src/utils/sanitiseSchema.utils';
+import { User, UserDocument } from 'src/schema/users.schema';
+import { RegisterUserDto, UpdateUserDto } from './users.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  async create(@Body() createUserDto: RegisterUserDto): Promise<User> {
+  async create(@Body() createUserDto: RegisterUserDto): Promise<UserDocument> {
     const createdUser = await this.userModel.create(createUserDto);
 
     return createdUser.save();
   }
 
-  async findUserEmail(@Body() email: string): Promise<User> {
-    try {
-      const findUser = await this.userModel.findOne({ email: email });
-
-      if (!findUser) {
-        // throw new NotFoundException('No user found using this email');
-        return null;
-      }
-
-      return sanitiseUser(findUser);
-
-      // return false;
-    } catch (error) {
-      throw new NotFoundException('No user found using this email');
-    }
+  async findById(id: string): Promise<UserDocument> {
+    return this.userModel.findById(id);
   }
 
-  async findAll(): Promise<User[]> {
-    try {
-      const findUser = await this.userModel.find().exec();
+  async findUserEmail(@Body() email: string): Promise<UserDocument> {
+    return await this.userModel.findOne({ email: email });
+  }
 
-      return sanitiseAllUsers(findUser);
-    } catch (error) {
-      throw new NotFoundException('Kuch nahi mila');
-    }
+  async findByRefreshToken(
+    @Body() refreshToken: string,
+  ): Promise<UserDocument> {
+    return await this.userModel.findOne({ refreshToken: refreshToken });
+  }
+
+  async findAll(): Promise<UserDocument[]> {
+    return this.userModel.find().exec();
+  }
+
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserDocument> {
+    return this.userModel
+      .findByIdAndUpdate(id, updateUserDto, { new: true })
+      .exec();
   }
 }

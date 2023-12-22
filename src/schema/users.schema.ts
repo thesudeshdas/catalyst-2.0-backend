@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { Document } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 
-export type UserDocument = HydratedDocument<User>;
+export type UserDocument = User & Document;
 
 @Schema()
 export class User {
@@ -33,6 +33,9 @@ export class User {
 
   @Prop({ enum: ['active', 'deprecated', 'inactive'], default: 'active' })
   status: 'active' | 'inactive' | 'deprecated';
+
+  @Prop()
+  refreshToken: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

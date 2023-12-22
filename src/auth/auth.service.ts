@@ -1,18 +1,19 @@
 import {
   Body,
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService, JwtSignOptions } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { LoginUserDto } from './auth.dto';
 import { validatePassword } from 'src/utils/validatePassword';
-import { User } from 'src/schema/users.schema';
+import * as bcrypt from 'bcrypt';
 
-export interface TokenResponse {
+export interface ITokenResponse {
   accessToken: string;
-  // refreshToken: string;
+  refreshToken: string;
 }
 
 export interface Token {
@@ -27,7 +28,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login(@Body() loginUserDto: LoginUserDto): Promise<TokenResponse> {
+  async login(@Body() loginUserDto: LoginUserDto): Promise<ITokenResponse> {
     const findUser = await this.usersService.findUserEmail(loginUserDto.email);
 
     if (!findUser) {
@@ -40,40 +41,79 @@ export class AuthService {
     ) {
       throw new UnauthorizedException('The password is incorrect');
     } else {
-      return {
-        accessToken: await this.jwtService.signAsync(
-          { sub: findUser.email },
-          this.getTokenOptions(),
-        ),
-      };
+      const tokens = await this.getTokens(findUser._id, findUser.email);
+
+      await this.updateRefreshToken(findUser._id, tokens.refreshToken);
+
+      return tokens;
     }
   }
 
-  async validate(@Body() email: string, password: string): Promise<User> {
-    const findUser = await this.usersService.findUserEmail(email);
+  async refreshTokens(refreshToken: string) {
+    const user = await this.usersService.findByRefreshToken(refreshToken);
 
-    if (!findUser) {
-      throw new NotFoundException('No user exists using this email address');
-    } else if (
-      !(await validatePassword({
-        stored: findUser.password,
-        provided: password,
-      }))
-    ) {
-      throw new UnauthorizedException('The password is incorrect');
-    } else {
-      return findUser;
+    if (!user || !user.refreshToken) {
+      console.log('here');
+
+      throw new ForbiddenException('Access Denied');
     }
+
+    const refreshTokenMatches = user.refreshToken === refreshToken;
+
+    if (!refreshTokenMatches) {
+      console.log('or here');
+
+      throw new ForbiddenException('Access Denied');
+    }
+
+    const tokens = await this.getTokens(user._id, user.email);
+
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
+
+    return tokens;
   }
 
-  private getTokenOptions() {
-    const jwtSecret = process.env.JWT_SECRET;
+  async hashData(data: string): Promise<string> {
+    const salt = await bcrypt.genSalt();
 
-    const options: JwtSignOptions = {
-      secret: `${jwtSecret}`,
-      expiresIn: '60m',
+    const hashedRefreshToken = await bcrypt.hash(data, salt);
+
+    return hashedRefreshToken;
+  }
+
+  async updateRefreshToken(userId: string, refreshToken: string) {
+    await this.usersService.update(userId, {
+      refreshToken: refreshToken,
+    });
+  }
+
+  async getTokens(userId: string, email: string): Promise<ITokenResponse> {
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(
+        {
+          sub: userId,
+          email,
+        },
+        {
+          secret: process.env.JWT_SECRET_ACCESS,
+          expiresIn: '15m',
+        },
+      ),
+      this.jwtService.signAsync(
+        {
+          sub: userId,
+          email,
+        },
+        {
+          secret: process.env.JWT_SECRET_REFRESH,
+          expiresIn: '7d',
+        },
+      ),
+    ]);
+
+    return {
+      accessToken,
+      refreshToken,
     };
-
-    return options;
   }
 }
