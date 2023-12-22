@@ -50,20 +50,25 @@ export class AuthService {
   }
 
   async refreshTokens(refreshToken: string) {
-    const user = await this.usersService.findByRefreshToken(refreshToken);
+    const decodedUser = await this.jwtService.decode(refreshToken);
 
-    if (!user || !user.refreshToken) {
-      console.log('here');
-
-      throw new ForbiddenException('Access Denied');
+    if (!decodedUser) {
+      throw new ForbiddenException('The refresh token is invalid');
     }
 
-    const refreshTokenMatches = user.refreshToken === refreshToken;
+    const user = await this.usersService.findUserEmail(decodedUser.email);
+
+    if (!user) {
+      throw new NotFoundException('No user found for this email');
+    }
+
+    const refreshTokenMatches = await bcrypt.compare(
+      refreshToken,
+      user.refreshToken,
+    );
 
     if (!refreshTokenMatches) {
-      console.log('or here');
-
-      throw new ForbiddenException('Access Denied');
+      throw new ForbiddenException('The refresh token is invalid');
     }
 
     const tokens = await this.getTokens(user._id, user.email);
@@ -73,17 +78,30 @@ export class AuthService {
     return tokens;
   }
 
-  async hashData(data: string): Promise<string> {
-    const salt = await bcrypt.genSalt();
+  async signRefreshToken(data: string): Promise<string> {
+    // const signedRefreshToken = await bcrypt.hash(data, 10);
 
-    const hashedRefreshToken = await bcrypt.hash(data, salt);
+    console.log({ data });
 
-    return hashedRefreshToken;
+    const signedRefreshToken = await this.jwtService.signAsync(
+      {
+        sub: data,
+      },
+      {
+        secret: process.env.RANDOM_STRING,
+      },
+    );
+
+    console.log('is it generating?', signedRefreshToken);
+
+    return signedRefreshToken;
   }
 
   async updateRefreshToken(userId: string, refreshToken: string) {
+    const signedRefreshToken = await bcrypt.hash(refreshToken, 10);
+
     await this.usersService.update(userId, {
-      refreshToken: refreshToken,
+      refreshToken: signedRefreshToken,
     });
   }
 
