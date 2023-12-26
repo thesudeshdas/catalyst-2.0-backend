@@ -5,15 +5,15 @@ export const registerUserSchema = z.object({
     .string({
       required_error: 'Name is required',
     })
-    .min(2, { message: 'Name must be 2 characters long' })
+    .min(2, { message: 'Name must be at least 2 characters long' })
     .max(32, { message: 'Name must be less than 32 characters long' }),
   email: z
     .string({
       required_error: 'Email is required',
     })
     .email('Email is not a valid email address')
-    .min(2, { message: 'Name must be 2 characters long' })
-    .max(32, { message: 'Name must be less than 32 characters long' }),
+    .min(2, { message: 'Email must be at least 3 characters long' })
+    .max(32, { message: 'Email must be less than 320 characters long' }),
   password: z
     .string({
       required_error: 'Password is required',
