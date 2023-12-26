@@ -40,7 +40,22 @@ export class AuthController {
 
     const createdUser = await this.userService.create(registerUserDto);
 
-    return createdUser;
+    const tokens = await this.authService.getTokens(
+      createdUser._id,
+      createdUser.email,
+    );
+
+    await this.authService.updateRefreshToken(
+      createdUser._id,
+      tokens.refreshToken,
+    );
+
+    const sanitisedUser = createdUser;
+
+    sanitisedUser.accessToken = tokens.accessToken;
+    sanitisedUser.refreshToken = tokens.refreshToken;
+
+    return sanitisedUser;
   }
 
   @Public()

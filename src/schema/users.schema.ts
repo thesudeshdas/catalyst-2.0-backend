@@ -6,9 +6,6 @@ export type UserDocument = User & Document;
 
 @Schema()
 export class User {
-  @Prop()
-  userId: string;
-
   @Prop({
     required: [true, 'Name is required'],
     minlength: [2, 'Name must be at least 2 characters long'],
@@ -36,6 +33,9 @@ export class User {
 
   @Prop()
   refreshToken: string;
+
+  @Prop()
+  accessToken: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
