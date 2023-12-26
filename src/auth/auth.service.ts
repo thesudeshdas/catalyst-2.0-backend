@@ -78,25 +78,6 @@ export class AuthService {
     return tokens;
   }
 
-  async signRefreshToken(data: string): Promise<string> {
-    // const signedRefreshToken = await bcrypt.hash(data, 10);
-
-    console.log({ data });
-
-    const signedRefreshToken = await this.jwtService.signAsync(
-      {
-        sub: data,
-      },
-      {
-        secret: process.env.RANDOM_STRING,
-      },
-    );
-
-    console.log('is it generating?', signedRefreshToken);
-
-    return signedRefreshToken;
-  }
-
   async updateRefreshToken(userId: string, refreshToken: string) {
     const signedRefreshToken = await bcrypt.hash(refreshToken, 10);
 

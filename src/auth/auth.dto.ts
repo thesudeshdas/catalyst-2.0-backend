@@ -6,8 +6,8 @@ export const loginUserSchema = z.object({
       required_error: 'Email is required',
     })
     .email('Email is not a valid email address')
-    .min(2, { message: 'Name must be 2 characters long' })
-    .max(32, { message: 'Name must be less than 32 characters long' }),
+    .min(2, { message: 'Email must be 3 characters long' })
+    .max(32, { message: 'Email must be less than 320 characters long' }),
   password: z
     .string({
       required_error: 'Password is required',
@@ -22,7 +22,7 @@ export const loginUserSchema = z.object({
       },
       {
         message:
-          'Password must be 8-32 characters, with at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*()_+).',
+          'Password must be 8-32 characters, with at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*()_+)',
       },
     ),
 });
