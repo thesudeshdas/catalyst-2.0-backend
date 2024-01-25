@@ -6,6 +6,8 @@ import { Module } from '@nestjs/common';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { PowstController } from './powst/powst.controller';
+import { PowstModule } from './powst/powst.module';
 
 @Module({
   imports: [
@@ -22,8 +24,9 @@ import { UsersModule } from './users/users.module';
     }),
     AuthModule,
     UsersModule,
+    PowstModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, PowstController],
   providers: [AppService],
 })
 export class AppModule {}

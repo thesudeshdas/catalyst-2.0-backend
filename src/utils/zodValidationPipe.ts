@@ -8,6 +8,8 @@ export class ZodValidationPipe implements PipeTransform {
     try {
       this.schema.parse(value);
     } catch (error) {
+      console.log({ error });
+
       const validationErrorMessages = error.errors.reduce(
         (acc, cur) => acc + cur.message + ', ',
         '',
