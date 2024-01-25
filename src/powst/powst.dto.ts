@@ -17,6 +17,7 @@ export const createPowstSchema = z.object({
     .max(1000, {
       message: 'Project description must be less than 100 characters',
     }),
+  image: z.any(),
 });
 
 export type CreatePowstDto = z.infer<typeof createPowstSchema>;

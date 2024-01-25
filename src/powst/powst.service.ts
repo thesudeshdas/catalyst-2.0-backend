@@ -11,10 +11,16 @@ export class PowstService {
     @InjectModel(Powst.name) private powstModel: Model<PowstDocument>,
   ) {}
 
-  async create(@Body() createPowstDto: CreatePowstDto): Promise<PowstDocument> {
+  async create(
+    @Body() createPowstDto: CreatePowstDto,
+    image: Express.Multer.File,
+  ): Promise<PowstDocument> {
     console.log({ createPowstDto });
 
-    const createdPowst = await this.powstModel.create(createPowstDto);
+    const createdPowst = await this.powstModel.create({
+      ...createPowstDto,
+      // image,
+    });
 
     console.log({ createdPowst });
 

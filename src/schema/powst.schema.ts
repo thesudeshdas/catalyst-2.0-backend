@@ -27,6 +27,9 @@ export class Powst {
 
   @Prop()
   techStack: { name: string; version: string }[];
+
+  @Prop()
+  image: File;
 }
 
 export const PowstSchema = SchemaFactory.createForClass(Powst);
