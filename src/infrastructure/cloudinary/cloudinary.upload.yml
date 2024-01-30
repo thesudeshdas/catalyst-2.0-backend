@@ -1,0 +1,26 @@
+{
+  uploadedImage:
+    {
+      asset_id: '51428b1136dab542dff1cf8b1d190510',
+      public_id: 'catalyst-2/sicndxejpmflkaydpakg',
+      version: 1706593429,
+      version_id: 'a33b98f656f319cd01db2957e57e30c7',
+      signature: '0bb015eeb1fd0a5afa87338346f84754b5e8215e',
+      width: 1920,
+      height: 1080,
+      format: 'jpg',
+      resource_type: 'image',
+      created_at: '2024-01-30T05:43:49Z',
+      tags: [],
+      bytes: 107232,
+      type: 'upload',
+      etag: '2f2dfb6479e5681a5bb4080802e7927d',
+      placeholder: false,
+      url: 'http://res.cloudinary.com/thesudeshdas/image/upload/v1706593429/catalyst-2/sicndxejpmflkaydpakg.jpg',
+      secure_url: 'https://res.cloudinary.com/thesudeshdas/image/upload/v1706593429/catalyst-2/sicndxejpmflkaydpakg.jpg',
+      folder: 'catalyst-2',
+      access_mode: 'public',
+      original_filename: 'file',
+      api_key: '679288128928753',
+    },
+}
