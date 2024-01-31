@@ -7,7 +7,6 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { PowstService } from './powst.service';
-import { CreatePowstDto } from './powst.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PowstDocument } from 'src/schema/powst.schema';
 
@@ -22,11 +21,12 @@ export class PowstController {
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  // @UsePipes(new ZodValidationPipe(createPowstSchema))
   createPowst(
-    @Body() createPowstDto: CreatePowstDto,
+    @Body() createPowstDto,
     @UploadedFile() image: Express.Multer.File,
   ): Promise<PowstDocument> {
     return this.powstService.create(createPowstDto, image);
   }
 }
+
+// TODO @thesudeshdas => Create the validation for create powst

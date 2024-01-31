@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Powst } from 'src/schema/powst.schema';
 import { PowstDocument } from 'src/schema/powst.schema';
-import { CreatePowstDto } from './powst.dto';
 import { CloudinaryService } from 'src/infrastructure/cloudinary/cloudinary.service';
 
 @Injectable()
@@ -14,7 +13,7 @@ export class PowstService {
   ) {}
 
   async create(
-    @Body() createPowstDto: CreatePowstDto,
+    @Body() createPowstDto,
     image: Express.Multer.File,
   ): Promise<PowstDocument> {
     const uploadedImage = await this.cloudinary.uploadImage(image);

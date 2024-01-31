@@ -25,11 +25,16 @@ export class Powst {
   })
   description: string;
 
-  @Prop()
+  @Prop({
+    required: [true, 'Tech stack is needed'],
+  })
   techStack: { name: string; version: string }[];
 
   @Prop()
   image: File;
+
+  @Prop()
+  imageAlt: string;
 }
 
 export const PowstSchema = SchemaFactory.createForClass(Powst);
