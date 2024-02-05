@@ -11,15 +11,8 @@ import { LoginUserDto } from './auth.dto';
 import { validatePassword } from 'src/utils/validatePassword';
 import * as bcrypt from 'bcrypt';
 
-export interface ITokenResponse {
-  accessToken: string;
-  refreshToken: string;
-}
-
-export interface Token {
-  sub: string;
-  email: string;
-}
+// import types
+import { ILoginResponse, IRefreshTokenResponse } from './auth.types';
 
 @Injectable()
 export class AuthService {
@@ -28,7 +21,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login(@Body() loginUserDto: LoginUserDto): Promise<ITokenResponse> {
+  async login(@Body() loginUserDto: LoginUserDto): Promise<ILoginResponse> {
     const findUser = await this.usersService.findUserEmail(loginUserDto.email);
 
     if (!findUser) {
@@ -45,7 +38,12 @@ export class AuthService {
 
       await this.updateRefreshToken(findUser._id, tokens.refreshToken);
 
-      return tokens;
+      return {
+        ...tokens,
+        email: findUser.email,
+        name: findUser.name,
+        userId: findUser._id,
+      };
     }
   }
 
@@ -86,7 +84,10 @@ export class AuthService {
     });
   }
 
-  async getTokens(userId: string, email: string): Promise<ITokenResponse> {
+  async getTokens(
+    userId: string,
+    email: string,
+  ): Promise<IRefreshTokenResponse> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {

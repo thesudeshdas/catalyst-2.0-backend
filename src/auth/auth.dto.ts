@@ -6,14 +6,14 @@ export const loginUserSchema = z.object({
       required_error: 'Email is required',
     })
     .email('Email is not a valid email address')
-    .min(2, { message: 'Email must be at least 3 characters long' })
-    .max(32, { message: 'Email must be less than 320 characters long' }),
+    .min(2, { message: 'Email must be at least 2 characters long' })
+    .max(32, { message: 'Email must be less than 32 characters' }),
   password: z
     .string({
       required_error: 'Password is required',
     })
     .min(8, 'Password must be at least 8 characters long')
-    .max(32, 'Password must be at max 32 characters long')
+    .max(32, 'Password must be at max 32 characters')
     .refine(
       (password) => {
         return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]+$/.test(
@@ -31,7 +31,7 @@ export type LoginUserDto = z.infer<typeof loginUserSchema>;
 
 export const refreshTokensSchema = z.object({
   refreshToken: z.string({
-    required_error: 'Email is required',
+    required_error: 'Refresh token is required',
   }),
 });
 

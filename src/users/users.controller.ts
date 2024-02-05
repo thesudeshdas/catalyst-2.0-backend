@@ -1,18 +1,19 @@
-import { Controller, Get } from '@nestjs/common';
-import { User } from 'src/schema/users.schema';
+import { Controller, Get, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  @Get('check')
-  getAllUsers(): Promise<User[]> {
-    return this.usersService.findAll();
-  }
-
   @Get()
   findAll() {
     return this.usersService.findAll();
+  }
+
+  @Public()
+  @Get('profile/:id')
+  async getPublicProfile(@Param('id') id) {
+    return this.usersService.findById(id);
   }
 }

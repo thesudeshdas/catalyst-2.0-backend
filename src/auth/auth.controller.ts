@@ -9,11 +9,12 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
-import { User } from 'src/schema/users.schema';
+import { UserDocument } from 'src/schema/users.schema';
 import { UsersService } from 'src/users/users.service';
 import { LoginUserDto, RefreshTokensDto, loginUserSchema } from './auth.dto';
 import { ZodValidationPipe } from 'src/utils/zodValidationPipe';
 import { RegisterUserDto, registerUserSchema } from 'src/users/users.dto';
+import { ILoginResponse, IRefreshTokenResponse } from './auth.types';
 
 @Controller('auth')
 export class AuthController {
@@ -26,14 +27,16 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UsePipes(new ZodValidationPipe(loginUserSchema))
   @Post('login')
-  login(@Body() loginUserDto: LoginUserDto) {
+  login(@Body() loginUserDto: LoginUserDto): Promise<ILoginResponse> {
     return this.authService.login(loginUserDto);
   }
 
   @Public()
   @UsePipes(new ZodValidationPipe(registerUserSchema))
   @Post('register')
-  async register(@Body() registerUserDto: RegisterUserDto): Promise<User> {
+  async register(
+    @Body() registerUserDto: RegisterUserDto,
+  ): Promise<UserDocument> {
     if (await this.userService.findUserEmail(registerUserDto.email)) {
       throw new BadRequestException('User with this email already exists');
     }
@@ -62,12 +65,7 @@ export class AuthController {
   @Post('refresh')
   async refreshTokens(
     @Body() refreshTokensDto: RefreshTokensDto,
-  ): Promise<any> {
+  ): Promise<IRefreshTokenResponse> {
     return this.authService.refreshTokens(refreshTokensDto.refreshToken);
   }
-
-  // @Get('profile')
-  // getProfile(@Request() req) {
-  //   return req.user;
-  // }
 }
