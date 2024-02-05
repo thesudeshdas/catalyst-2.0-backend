@@ -9,11 +9,13 @@ import {
 import { PowstService } from './powst.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PowstDocument } from 'src/schema/powst.schema';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('powst')
 export class PowstController {
   constructor(private powstService: PowstService) {}
 
+  @Public()
   @Get()
   getAllPowst() {
     return this.powstService.findAll();
