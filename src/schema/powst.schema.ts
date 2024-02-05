@@ -20,8 +20,6 @@ export class Powst {
 
   @Prop({
     required: [true, 'Project description is required'],
-    minlength: [50, 'Project description must be at least 50 characters long'],
-    maxlength: [100, 'Project description must be less than 1000 characters'],
   })
   description: string;
 

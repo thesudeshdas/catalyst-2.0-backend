@@ -20,7 +20,7 @@ export class PowstController {
   }
 
   @Post()
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('image'))
   createPowst(
     @Body() createPowstDto,
     @UploadedFile() image: Express.Multer.File,
