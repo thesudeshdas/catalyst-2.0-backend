@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, SchemaTypes } from 'mongoose';
+import { User } from './users.schema';
 
 export type PowstDocument = Powst & Document;
 
@@ -33,6 +34,13 @@ export class Powst {
 
   @Prop()
   imageAlt: string;
+
+  @Prop({
+    type: SchemaTypes.ObjectId,
+    required: [true, 'Powst can not be created without a valid userId'],
+    ref: 'User',
+  })
+  owner: User;
 }
 
 export const PowstSchema = SchemaFactory.createForClass(Powst);

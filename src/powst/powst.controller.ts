@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -19,6 +20,12 @@ export class PowstController {
   @Get()
   getAllPowst() {
     return this.powstService.findAll();
+  }
+
+  @Public()
+  @Get('user/:userId')
+  getAllUserPowsts(@Param('userId') userId): Promise<PowstDocument[]> {
+    return this.powstService.findPowstsById(userId);
   }
 
   @Post()
