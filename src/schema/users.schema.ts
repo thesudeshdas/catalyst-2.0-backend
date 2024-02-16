@@ -22,12 +22,6 @@ export class User {
   @Prop()
   password: string;
 
-  @Prop()
-  profilePic: string;
-
-  @Prop()
-  bio: string;
-
   @Prop({ enum: ['active', 'deprecated', 'inactive'], default: 'active' })
   status: 'active' | 'inactive' | 'deprecated';
 
@@ -36,6 +30,15 @@ export class User {
 
   @Prop()
   accessToken: string;
+
+  @Prop()
+  profilePic: string;
+
+  @Prop()
+  bio: string;
+
+  @Prop()
+  techStack: { name: string; version: string }[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

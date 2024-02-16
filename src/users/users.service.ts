@@ -15,17 +15,21 @@ export class UsersService {
   }
 
   async findById(id: string): Promise<UserDocument> {
-    return this.userModel.findById(id);
+    return this.userModel
+      .findById(id)
+      .select('-refreshToken -accessToken -password')
+      .lean()
+      .exec();
   }
 
   async findUserEmail(@Body() email: string): Promise<UserDocument> {
-    return await this.userModel.findOne({ email: email });
+    return this.userModel.findOne({ email: email }).exec();
   }
 
   async findByRefreshToken(
     @Body() refreshToken: string,
   ): Promise<UserDocument> {
-    return await this.userModel.findOne({ refreshToken: refreshToken });
+    return this.userModel.findOne({ refreshToken: refreshToken }).exec();
   }
 
   async findAll(): Promise<UserDocument[]> {
@@ -38,6 +42,14 @@ export class UsersService {
   ): Promise<UserDocument> {
     return this.userModel
       .findByIdAndUpdate(id, updateUserDto, { new: true })
+      .exec();
+  }
+
+  async getPublicProfile(userId: string): Promise<UserDocument> {
+    return this.userModel
+      .findById(userId)
+      .select('-refreshToken -accessToken -password')
+      .lean()
       .exec();
   }
 }
