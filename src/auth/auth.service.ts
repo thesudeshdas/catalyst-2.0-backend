@@ -41,7 +41,8 @@ export class AuthService {
       return {
         ...tokens,
         email: findUser.email,
-        name: findUser.name,
+        firstName: findUser.firstName,
+        lastName: findUser.lastName,
         userId: findUser._id,
       };
     }

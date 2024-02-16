@@ -9,9 +9,12 @@ export class User {
   @Prop({
     required: [true, 'Name is required'],
     minlength: [2, 'Name must be at least 2 characters long'],
-    maxlength: [32, 'Name must be less than 32 characters long'],
+    maxlength: [32, 'Name must be less than 32 characters'],
   })
-  name: string;
+  firstName: string;
+
+  @Prop()
+  lastName: string;
 
   @Prop({
     required: [true, 'Email is required'],

@@ -1,7 +1,8 @@
 export interface ILoginResponse {
   accessToken: string;
   refreshToken: string;
-  name: string;
+  firstName: string;
+  lastName?: string;
   email: string;
   userId: string;
 }

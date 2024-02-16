@@ -22,13 +22,17 @@ export class PowstService {
   }
 
   async findAll(): Promise<PowstDocument[]> {
-    return this.powstModel.find().populate('owner', 'name email').lean().exec();
+    return this.powstModel
+      .find()
+      .populate('owner', 'firstName lastName email')
+      .lean()
+      .exec();
   }
 
   async findPowstsById(userId: string): Promise<PowstDocument[]> {
     return this.powstModel
       .find({ owner: userId })
-      .populate('owner', 'name email')
+      .populate('owner', 'firstName lastName email')
       .lean()
       .exec();
   }
