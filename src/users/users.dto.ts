@@ -9,7 +9,6 @@ export const registerUserSchema = z.object({
     .max(32, { message: 'First name must be less than 32 characters' }),
   lastName: z
     .string()
-    .min(2, { message: 'Last name must be at least 2 characters long' })
     .max(32, { message: 'Last name must be less than 32 characters' })
     .optional(),
   email: z

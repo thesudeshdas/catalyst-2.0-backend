@@ -42,6 +42,9 @@ export class User {
 
   @Prop()
   techStack: { name: string; version: string }[];
+
+  @Prop()
+  headline: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
