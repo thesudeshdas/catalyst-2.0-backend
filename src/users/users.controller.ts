@@ -21,11 +21,6 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get('profile/:id')
-  getUserDetails(@Param('id') id) {
-    return this.usersService.findById(id);
-  }
-
   @Public()
   @Get('/:userId')
   getPublicProfile(@Param('userId') userId): Promise<UserDocument> {
@@ -40,5 +35,13 @@ export class UsersController {
     @UploadedFile() profilePic: Express.Multer.File,
   ) {
     return this.usersService.updateUser(userId, updateUserDto, profilePic);
+  }
+
+  @Public()
+  @Get('/:userId/powsts')
+  getAllUserPowsts(@Param('userId') userId) {
+    console.log({ userId });
+
+    return this.usersService.findPowstsByUser(userId);
   }
 }

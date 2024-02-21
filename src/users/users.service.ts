@@ -18,14 +18,6 @@ export class UsersService {
     return createdUser.save();
   }
 
-  async findById(id: string): Promise<UserDocument> {
-    return this.userModel
-      .findById(id)
-      .select('-refreshToken -accessToken -password')
-      .lean()
-      .exec();
-  }
-
   async findUserEmail(@Body() email: string): Promise<UserDocument> {
     return this.userModel.findOne({ email: email }).exec();
   }
@@ -53,6 +45,13 @@ export class UsersService {
     return this.userModel
       .findById(userId)
       .select('-refreshToken -accessToken -password')
+      .populate({
+        path: 'powsts.powst',
+        select: '_id title image imageAlt owner description',
+        options: {
+          limit: 3,
+        },
+      })
       .lean()
       .exec();
   }
@@ -73,6 +72,13 @@ export class UsersService {
             new: true,
           },
         )
+        .populate({
+          path: 'powsts.powst',
+          select: '_id title image imageAlt owner description',
+          options: {
+            limit: 3,
+          },
+        })
         .select('-refreshToken -accessToken -password');
     }
 
@@ -84,6 +90,13 @@ export class UsersService {
           new: true,
         },
       )
+      .populate({
+        path: 'powsts.powst',
+        select: '_id title image imageAlt owner description',
+        options: {
+          limit: 3,
+        },
+      })
       .select('-refreshToken -accessToken -password');
   }
 
@@ -98,5 +111,17 @@ export class UsersService {
     }
 
     return uploadedImage.secure_url;
+  }
+
+  async findPowstsByUser(userId: string) {
+    return this.userModel
+      .findById(userId)
+      .select('powsts')
+      .populate({
+        path: 'powsts.powst',
+        select: '_id title image imageAlt owner description',
+      })
+      .lean()
+      .exec();
   }
 }

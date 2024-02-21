@@ -29,14 +29,6 @@ export class PowstService {
       .exec();
   }
 
-  async findPowstsById(userId: string): Promise<PowstDocument[]> {
-    return this.powstModel
-      .find({ owner: userId })
-      .populate('owner', 'firstName lastName email')
-      .lean()
-      .exec();
-  }
-
   private async uploadImageToCloudinary(image: Express.Multer.File) {
     const uploadedImage = await this.cloudinary.uploadImage(image);
 

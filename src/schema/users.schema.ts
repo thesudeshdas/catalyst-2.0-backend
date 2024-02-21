@@ -1,8 +1,45 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, SchemaTypes } from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import { Powst } from './powst.schema';
 
 export type UserDocument = User & Document;
+
+@Schema()
+class Socials {
+  @Prop()
+  github: string;
+
+  @Prop()
+  gitlab: string;
+
+  @Prop()
+  twitter: string;
+
+  @Prop()
+  linkedIn: string;
+
+  @Prop()
+  medium: string;
+
+  @Prop()
+  hashnode: string;
+
+  @Prop()
+  devTo: string;
+
+  @Prop()
+  instagram: string;
+
+  @Prop()
+  youtube: string;
+
+  @Prop()
+  dribbble: string;
+
+  @Prop()
+  behance: string;
+}
 
 @Schema()
 export class User {
@@ -45,6 +82,25 @@ export class User {
 
   @Prop()
   headline: string;
+
+  @Prop()
+  location: string;
+
+  @Prop()
+  socials: Socials;
+
+  @Prop({
+    type: [
+      {
+        powst: {
+          type: SchemaTypes.ObjectId,
+          ref: 'Powst',
+          required: [true, 'Powst can not be created without a valid userId'],
+        },
+      },
+    ],
+  })
+  powsts: { powst: Powst }[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
