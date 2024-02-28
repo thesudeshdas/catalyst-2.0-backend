@@ -3,11 +3,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Powst, PowstDocument } from 'src/schema/powst.schema';
 import { CloudinaryService } from 'src/infrastructure/cloudinary/cloudinary.service';
+import { User, UserDocument } from 'src/schema/user.schema';
 
 @Injectable()
 export class PowstService {
   constructor(
     @InjectModel(Powst.name) private powstModel: Model<PowstDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
     private cloudinary: CloudinaryService,
   ) {}
 
@@ -18,7 +20,17 @@ export class PowstService {
     const uploadedImage = await this.uploadImageToCloudinary(image);
     const createdPowst = await this.createPowst(createPowstDto, uploadedImage);
 
-    return createdPowst;
+    const savedPowst = await createdPowst.save();
+
+    await this.userModel.findOneAndUpdate(
+      {
+        _id: createPowstDto.owner,
+      },
+      { $push: { powsts: { powst: savedPowst._id } } },
+      { new: true },
+    );
+
+    return savedPowst.populate('owner', 'firstName lastName email');
   }
 
   async findAll(): Promise<PowstDocument[]> {
