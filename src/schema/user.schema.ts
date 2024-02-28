@@ -8,37 +8,10 @@ export type UserDocument = User & Document;
 @Schema()
 class Socials {
   @Prop()
-  github: string;
+  name: string;
 
   @Prop()
-  gitlab: string;
-
-  @Prop()
-  twitter: string;
-
-  @Prop()
-  linkedIn: string;
-
-  @Prop()
-  medium: string;
-
-  @Prop()
-  hashnode: string;
-
-  @Prop()
-  devTo: string;
-
-  @Prop()
-  instagram: string;
-
-  @Prop()
-  youtube: string;
-
-  @Prop()
-  dribbble: string;
-
-  @Prop()
-  behance: string;
+  link: string;
 }
 
 @Schema()
@@ -78,6 +51,12 @@ export class User {
   bio: string;
 
   @Prop()
+  description: string;
+
+  @Prop()
+  specialisation: string[];
+
+  @Prop()
   techStack: { name: string; version: string }[];
 
   @Prop()
@@ -87,7 +66,7 @@ export class User {
   location: string;
 
   @Prop()
-  socials: Socials;
+  socials: Socials[];
 
   @Prop({
     type: [
@@ -101,6 +80,19 @@ export class User {
     ],
   })
   powsts: { powst: Powst }[];
+
+  @Prop({
+    type: [
+      {
+        blog: {
+          type: SchemaTypes.ObjectId,
+          ref: 'Blog',
+          required: [true, 'Blog can not be created without a valid userId'],
+        },
+      },
+    ],
+  })
+  blogs: { powst: Powst }[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -8,6 +8,8 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { PowstController } from './powst/powst.controller';
 import { PowstModule } from './powst/powst.module';
+import { BlogController } from './blog/blog.controller';
+import { BlogModule } from './blog/blog.module';
 
 @Module({
   imports: [
@@ -25,8 +27,9 @@ import { PowstModule } from './powst/powst.module';
     AuthModule,
     UsersModule,
     PowstModule,
+    BlogModule,
   ],
-  controllers: [AppController, PowstController],
+  controllers: [AppController, PowstController, BlogController],
   providers: [AppService],
 })
 export class AppModule {}

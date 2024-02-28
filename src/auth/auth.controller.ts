@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
-import { UserDocument } from 'src/schema/users.schema';
+import { UserDocument } from 'src/schema/user.schema';
 import { UsersService } from 'src/users/users.service';
 import { LoginUserDto, RefreshTokensDto, loginUserSchema } from './auth.dto';
 import { ZodValidationPipe } from 'src/utils/zodValidationPipe';

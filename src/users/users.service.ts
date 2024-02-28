@@ -1,7 +1,7 @@
 import { Body, HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User, UserDocument } from 'src/schema/users.schema';
+import { User, UserDocument } from 'src/schema/user.schema';
 import { RegisterUserDto, UpdateUserDto } from './users.dto';
 import { CloudinaryService } from 'src/infrastructure/cloudinary/cloudinary.service';
 

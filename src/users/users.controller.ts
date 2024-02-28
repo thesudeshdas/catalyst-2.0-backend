@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Public } from 'src/auth/decorators/public.decorator';
-import { UserDocument } from 'src/schema/users.schema';
+import { UserDocument } from 'src/schema/user.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
@@ -40,8 +40,6 @@ export class UsersController {
   @Public()
   @Get('/:userId/powsts')
   getAllUserPowsts(@Param('userId') userId) {
-    console.log({ userId });
-
     return this.usersService.findPowstsByUser(userId);
   }
 }
