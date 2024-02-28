@@ -45,13 +45,22 @@ export class UsersService {
     return this.userModel
       .findById(userId)
       .select('-refreshToken -accessToken -password')
-      .populate({
-        path: 'powsts.powst',
-        select: '_id title image imageAlt owner description',
-        options: {
-          limit: 3,
+      .populate([
+        {
+          path: 'powsts.powst',
+          select: '_id title image imageAlt owner description',
+          options: {
+            limit: 4,
+          },
         },
-      })
+        {
+          path: 'blogs.blog',
+          select: '_id title link platform owner ',
+          options: {
+            limit: 4,
+          },
+        },
+      ])
       .lean()
       .exec();
   }
@@ -72,13 +81,22 @@ export class UsersService {
             new: true,
           },
         )
-        .populate({
-          path: 'powsts.powst',
-          select: '_id title image imageAlt owner description',
-          options: {
-            limit: 3,
+        .populate([
+          {
+            path: 'powsts.powst',
+            select: '_id title image imageAlt owner description',
+            options: {
+              limit: 4,
+            },
           },
-        })
+          {
+            path: 'blogs.blog',
+            select: '_id title link platform owner ',
+            options: {
+              limit: 4,
+            },
+          },
+        ])
         .select('-refreshToken -accessToken -password');
     }
 
@@ -90,13 +108,22 @@ export class UsersService {
           new: true,
         },
       )
-      .populate({
-        path: 'powsts.powst',
-        select: '_id title image imageAlt owner description',
-        options: {
-          limit: 3,
+      .populate([
+        {
+          path: 'powsts.powst',
+          select: '_id title image imageAlt owner description',
+          options: {
+            limit: 4,
+          },
         },
-      })
+        {
+          path: 'blogs.blog',
+          select: '_id title link platform owner ',
+          options: {
+            limit: 4,
+          },
+        },
+      ])
       .select('-refreshToken -accessToken -password');
   }
 
@@ -117,10 +144,12 @@ export class UsersService {
     return this.userModel
       .findById(userId)
       .select('powsts')
-      .populate({
-        path: 'powsts.powst',
-        select: '_id title image imageAlt owner description',
-      })
+      .populate([
+        {
+          path: 'powsts.powst',
+          select: '_id title image imageAlt owner description ',
+        },
+      ])
       .lean()
       .exec();
   }
