@@ -37,11 +37,11 @@ export class AuthController {
   async register(
     @Body() registerUserDto: RegisterUserDto,
   ): Promise<UserDocument> {
-    if (await this.userService.findUserEmail(registerUserDto.email)) {
+    if (await this.userService.findUserByEmail(registerUserDto.email)) {
       throw new BadRequestException('User with this email already exists');
     }
 
-    const createdUser = await this.userService.create(registerUserDto);
+    const createdUser = await this.userService.createUser(registerUserDto);
 
     const tokens = await this.authService.getTokens(
       createdUser._id,

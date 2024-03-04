@@ -22,7 +22,9 @@ export class AuthService {
   ) {}
 
   async login(@Body() loginUserDto: LoginUserDto): Promise<ILoginResponse> {
-    const findUser = await this.usersService.findUserEmail(loginUserDto.email);
+    const findUser = await this.usersService.findUserByEmail(
+      loginUserDto.email,
+    );
 
     if (!findUser) {
       throw new NotFoundException('No user exists using this email address');
@@ -55,7 +57,7 @@ export class AuthService {
       throw new ForbiddenException('The refresh token is invalid');
     }
 
-    const user = await this.usersService.findUserEmail(decodedUser.email);
+    const user = await this.usersService.findUserByEmail(decodedUser.email);
 
     if (!user) {
       throw new NotFoundException('No user found for this email');
@@ -80,7 +82,7 @@ export class AuthService {
   async updateRefreshToken(userId: string, refreshToken: string) {
     const signedRefreshToken = await bcrypt.hash(refreshToken, 10);
 
-    await this.usersService.update(userId, {
+    await this.usersService.updateRefreshToken(userId, {
       refreshToken: signedRefreshToken,
     });
   }

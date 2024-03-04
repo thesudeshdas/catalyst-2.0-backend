@@ -16,11 +16,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
-
   @Public()
   @Get('/:userId')
   getPublicProfile(@Param('userId') userId): Promise<UserDocument> {

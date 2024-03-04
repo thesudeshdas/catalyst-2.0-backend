@@ -1,14 +1,14 @@
-import {
-  Body,
-  ConflictException,
-  HttpException,
-  Injectable,
-} from '@nestjs/common';
+import { Body, HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from 'src/schema/user.schema';
 import { UpdateUserDto } from './users.dto';
 import { CloudinaryService } from 'src/infrastructure/cloudinary/cloudinary.service';
+
+const powstPopulation = '_id title image imageAlt owner description';
+const blogPopulation = '_id title link platform owner ';
+
+const removeTokenAndPassword = '-refreshToken -accessToken -password';
 
 @Injectable()
 export class UsersService {
@@ -17,7 +17,7 @@ export class UsersService {
     private cloudinary: CloudinaryService,
   ) {}
 
-  async create(@Body() createUserDto): Promise<UserDocument> {
+  async createUser(@Body() createUserDto): Promise<UserDocument> {
     createUserDto.username = createUserDto.email;
 
     const createdUser = await this.userModel.create(createUserDto);
@@ -25,140 +25,38 @@ export class UsersService {
     return createdUser.save();
   }
 
-  async findUserEmail(@Body() email: string): Promise<UserDocument> {
-    return this.userModel.findOne({ email: email }).exec();
-  }
-
-  async findByRefreshToken(
-    @Body() refreshToken: string,
-  ): Promise<UserDocument> {
-    return this.userModel.findOne({ refreshToken: refreshToken }).exec();
-  }
-
-  async findAll(): Promise<UserDocument[]> {
-    return this.userModel.find().exec();
-  }
-
-  async update(
-    id: string,
-    updateUserDto: UpdateUserDto,
-  ): Promise<UserDocument> {
-    return this.userModel
-      .findByIdAndUpdate(id, updateUserDto, { new: true })
-      .exec();
-  }
-
-  async getPublicProfile(userId: string): Promise<UserDocument> {
-    return this.userModel
-      .findById(userId)
-      .select('-refreshToken -accessToken -password')
-      .populate([
-        {
-          path: 'powsts.powst',
-          select: '_id title image imageAlt owner description',
-          options: {
-            limit: 4,
-          },
-        },
-        {
-          path: 'blogs.blog',
-          select: '_id title link platform owner ',
-          options: {
-            limit: 4,
-          },
-        },
-      ])
-      .lean()
-      .exec();
-  }
-
   async updateUser(
     userId: string,
     updateUserDto,
     profilePic: Express.Multer.File,
   ): Promise<UserDocument> {
-    if (profilePic) {
-      const updatedProfilePic = await this.uploadImageToCloudinary(profilePic);
-
-      return this.userModel
-        .findOneAndUpdate(
-          { _id: userId },
-          { ...updateUserDto, profilePic: updatedProfilePic },
-          {
-            new: true,
-          },
-        )
-        .populate([
-          {
-            path: 'powsts.powst',
-            select: '_id title image imageAlt owner description',
-            options: {
-              limit: 4,
-            },
-          },
-          {
-            path: 'blogs.blog',
-            select: '_id title link platform owner ',
-            options: {
-              limit: 4,
-            },
-          },
-        ])
-        .select('-refreshToken -accessToken -password');
-    }
+    const updateFields = profilePic
+      ? {
+          ...updateUserDto,
+          profilePic: await this.uploadImageToCloudinary(profilePic),
+        }
+      : { ...updateUserDto };
 
     return this.userModel
-      .findOneAndUpdate(
-        { _id: userId },
-        { ...updateUserDto },
-        {
-          new: true,
-        },
-      )
+      .findByIdAndUpdate(userId, updateFields, { new: true })
       .populate([
         {
           path: 'powsts.powst',
-          select: '_id title image imageAlt owner description',
-          options: {
-            limit: 4,
-          },
+          select: powstPopulation,
+          options: { limit: 4 },
         },
         {
           path: 'blogs.blog',
-          select: '_id title link platform owner ',
-          options: {
-            limit: 4,
-          },
+          select: blogPopulation,
+          options: { limit: 4 },
         },
       ])
-      .select('-refreshToken -accessToken -password');
-  }
-
-  private async uploadImageToCloudinary(image: Express.Multer.File) {
-    const uploadedImage = await this.cloudinary.uploadImage(image);
-
-    if (!uploadedImage?.secure_url) {
-      throw new HttpException(
-        'Something went wrong while uploading the image',
-        500,
-      );
-    }
-
-    return uploadedImage.secure_url;
-  }
-
-  async findPowstsByUser(userId: string) {
-    return this.userModel
-      .findById(userId)
-      .select('powsts')
-      .populate([
-        {
-          path: 'powsts.powst',
-          select: '_id title image imageAlt owner description ',
-        },
-      ])
-      .lean()
+      .select(removeTokenAndPassword)
       .exec();
+  }
+
+  async findUserByEmail(@Body() email: string): Promise<UserDocument> {
+    return this.userModel.findOne({ email: email }).exec();
   }
 
   async findUsername(username: string) {
@@ -174,5 +72,65 @@ export class UsersService {
       success: true,
       message: 'Username is available',
     };
+  }
+
+  async updateRefreshToken(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserDocument> {
+    return this.userModel
+      .findByIdAndUpdate(id, updateUserDto, { new: true })
+      .exec();
+  }
+
+  async getPublicProfile(userId: string): Promise<UserDocument> {
+    return this.userModel
+      .findById(userId)
+      .select(removeTokenAndPassword)
+      .populate([
+        {
+          path: 'powsts.powst',
+          select: powstPopulation,
+          options: {
+            limit: 4,
+          },
+        },
+        {
+          path: 'blogs.blog',
+          select: blogPopulation,
+          options: {
+            limit: 4,
+          },
+        },
+      ])
+      .lean()
+      .exec();
+  }
+
+  async findPowstsByUser(userId: string) {
+    return this.userModel
+      .findById(userId)
+      .select('powsts')
+      .populate([
+        {
+          path: 'powsts.powst',
+          select: powstPopulation,
+        },
+      ])
+      .lean()
+      .exec();
+  }
+
+  private async uploadImageToCloudinary(image: Express.Multer.File) {
+    const uploadedImage = await this.cloudinary.uploadImage(image);
+
+    if (!uploadedImage?.secure_url) {
+      throw new HttpException(
+        'Something went wrong while uploading the image',
+        500,
+      );
+    }
+
+    return uploadedImage.secure_url;
   }
 }
