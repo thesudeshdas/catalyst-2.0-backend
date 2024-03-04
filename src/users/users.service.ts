@@ -1,8 +1,13 @@
-import { Body, HttpException, Injectable } from '@nestjs/common';
+import {
+  Body,
+  ConflictException,
+  HttpException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from 'src/schema/user.schema';
-import { RegisterUserDto, UpdateUserDto } from './users.dto';
+import { UpdateUserDto } from './users.dto';
 import { CloudinaryService } from 'src/infrastructure/cloudinary/cloudinary.service';
 
 @Injectable()
@@ -12,7 +17,9 @@ export class UsersService {
     private cloudinary: CloudinaryService,
   ) {}
 
-  async create(@Body() createUserDto: RegisterUserDto): Promise<UserDocument> {
+  async create(@Body() createUserDto): Promise<UserDocument> {
+    createUserDto.username = createUserDto.email;
+
     const createdUser = await this.userModel.create(createUserDto);
 
     return createdUser.save();
@@ -152,5 +159,20 @@ export class UsersService {
       ])
       .lean()
       .exec();
+  }
+
+  async findUsername(username: string) {
+    const foundUsername = await this.userModel.findOne({ username: username });
+
+    if (foundUsername) {
+      return {
+        success: false,
+        message: 'Username is already taken. Please try again',
+      };
+    }
+    return {
+      success: true,
+      message: 'Username is available',
+    };
   }
 }

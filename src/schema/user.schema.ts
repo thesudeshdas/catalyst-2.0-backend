@@ -35,6 +35,11 @@ export class User {
   @Prop()
   password: string;
 
+  @Prop({
+    unique: true,
+  })
+  username: string;
+
   @Prop({ enum: ['active', 'deprecated', 'inactive'], default: 'active' })
   status: 'active' | 'inactive' | 'deprecated';
 

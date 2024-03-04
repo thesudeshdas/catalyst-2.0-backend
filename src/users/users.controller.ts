@@ -42,4 +42,10 @@ export class UsersController {
   getAllUserPowsts(@Param('userId') userId) {
     return this.usersService.findPowstsByUser(userId);
   }
+
+  @Public()
+  @Get('/username/:username')
+  getUsernameAvailability(@Param('username') username) {
+    return this.usersService.findUsername(username);
+  }
 }
