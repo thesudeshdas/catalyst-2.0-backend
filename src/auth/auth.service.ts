@@ -46,6 +46,7 @@ export class AuthService {
         firstName: findUser.firstName,
         lastName: findUser.lastName,
         userId: findUser._id,
+        username: findUser.username,
       };
     }
   }

@@ -85,7 +85,7 @@ export class UsersService {
 
   async getPublicProfile(userId: string): Promise<UserDocument> {
     return this.userModel
-      .findById(userId)
+      .findOne({ username: userId })
       .select(removeTokenAndPassword)
       .populate([
         {
@@ -109,7 +109,7 @@ export class UsersService {
 
   async findPowstsByUser(userId: string) {
     return this.userModel
-      .findById(userId)
+      .findOne({ username: userId })
       .select('powsts')
       .populate([
         {

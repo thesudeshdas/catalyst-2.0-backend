@@ -36,7 +36,7 @@ export class PowstService {
   async findAll(): Promise<PowstDocument[]> {
     return this.powstModel
       .find()
-      .populate('owner', 'firstName lastName email')
+      .populate('owner', 'firstName lastName email username profilePic')
       .lean()
       .exec();
   }

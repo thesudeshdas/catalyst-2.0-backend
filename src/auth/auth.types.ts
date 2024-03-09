@@ -5,6 +5,7 @@ export interface ILoginResponse {
   lastName?: string;
   email: string;
   userId: string;
+  username: string;
 }
 
 export interface IRefreshTokenResponse {
