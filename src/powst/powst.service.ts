@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { Powst, PowstDocument } from 'src/schema/powst.schema';
 import { CloudinaryService } from 'src/infrastructure/cloudinary/cloudinary.service';
 import { User, UserDocument } from 'src/schema/user.schema';
+import { userPopulation } from 'src/constants/population.constants';
 
 @Injectable()
 export class PowstService {
@@ -30,13 +31,13 @@ export class PowstService {
       { new: true },
     );
 
-    return savedPowst.populate('owner', 'firstName lastName email');
+    return savedPowst.populate('owner', userPopulation);
   }
 
   async findAll(): Promise<PowstDocument[]> {
     return this.powstModel
       .find()
-      .populate('owner', 'firstName lastName email username profilePic')
+      .populate('owner', userPopulation)
       .lean()
       .exec();
   }

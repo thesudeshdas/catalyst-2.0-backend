@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { userPopulation } from 'src/constants/population.constants';
 import { Blog, BlogDocument } from 'src/schema/blog.schema';
 import { User, UserDocument } from 'src/schema/user.schema';
 
@@ -24,7 +25,7 @@ export class BlogService {
       { new: true },
     );
 
-    return savedBlog.populate('owner', 'firstName lastName email');
+    return savedBlog.populate('owner', userPopulation);
   }
 
   async getAllUserBlogs(userId: string) {

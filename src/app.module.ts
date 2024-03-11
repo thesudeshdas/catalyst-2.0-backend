@@ -10,6 +10,9 @@ import { PowstController } from './powst/powst.controller';
 import { PowstModule } from './powst/powst.module';
 import { BlogController } from './blog/blog.controller';
 import { BlogModule } from './blog/blog.module';
+import { WorkService } from './work/work.service';
+import { WorkController } from './work/work.controller';
+import { WorkModule } from './work/work.module';
 
 @Module({
   imports: [
@@ -28,8 +31,9 @@ import { BlogModule } from './blog/blog.module';
     UsersModule,
     PowstModule,
     BlogModule,
+    WorkModule,
   ],
-  controllers: [AppController, PowstController, BlogController],
+  controllers: [AppController, PowstController, BlogController, WorkController],
   providers: [AppService],
 })
 export class AppModule {}
