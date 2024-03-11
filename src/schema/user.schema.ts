@@ -2,6 +2,8 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, SchemaTypes } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { Powst } from './powst.schema';
+import { Blog } from './blog.schema';
+import { Work } from './work.schema';
 
 export type UserDocument = User & Document;
 
@@ -79,7 +81,7 @@ export class User {
         powst: {
           type: SchemaTypes.ObjectId,
           ref: 'Powst',
-          required: [true, 'Powst can not be created without a valid userId'],
+          required: [true, 'Powst can not be created without a valid id'],
         },
       },
     ],
@@ -92,12 +94,25 @@ export class User {
         blog: {
           type: SchemaTypes.ObjectId,
           ref: 'Blog',
-          required: [true, 'Blog can not be created without a valid userId'],
+          required: [true, 'Blog can not be created without a valid id'],
         },
       },
     ],
   })
-  blogs: { powst: Powst }[];
+  blogs: { blog: Blog }[];
+
+  @Prop({
+    type: [
+      {
+        work: {
+          type: SchemaTypes.ObjectId,
+          ref: 'Work',
+          required: [true, 'Work can not be created without a valid id'],
+        },
+      },
+    ],
+  })
+  works: { work: Work }[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

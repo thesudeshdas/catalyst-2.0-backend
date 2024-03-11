@@ -18,12 +18,34 @@ export class WorkService {
     createWorkDto,
     image: Express.Multer.File,
   ): Promise<WorkDocument> {
-    const uploadedImage = await this.uploadImageToCloudinary(image);
+    let uploadedImage;
+
+    if (image) {
+      uploadedImage = await this.uploadImageToCloudinary(image);
+    } else {
+      uploadedImage = 'http://via.placeholder.com/200x200';
+    }
+
     const createdWork = await this.create(createWorkDto, uploadedImage);
 
-    const savedPowst = await createdWork.save();
+    const savedWork = await createdWork.save();
 
-    return savedPowst.populate('owner', userPopulation);
+    await this.userModel.findOneAndUpdate(
+      {
+        _id: savedWork.owner,
+      },
+      { $push: { works: { work: savedWork._id } } },
+      { new: true },
+    );
+
+    return savedWork.populate('owner', userPopulation);
+  }
+
+  async getAllUserWorks(userId: string) {
+    return this.userModel
+      .findOne({ username: userId })
+      .select('works')
+      .populate('works.work');
   }
 
   private async uploadImageToCloudinary(image: Express.Multer.File) {
@@ -42,7 +64,7 @@ export class WorkService {
   private async create(createWorkDto, imageUrl: string) {
     const createdWork = await this.workModel.create({
       ...createWorkDto,
-      image: imageUrl,
+      companyLogo: imageUrl,
     });
 
     return createdWork.save();

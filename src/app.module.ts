@@ -10,7 +10,6 @@ import { PowstController } from './powst/powst.controller';
 import { PowstModule } from './powst/powst.module';
 import { BlogController } from './blog/blog.controller';
 import { BlogModule } from './blog/blog.module';
-import { WorkService } from './work/work.service';
 import { WorkController } from './work/work.controller';
 import { WorkModule } from './work/work.module';
 
