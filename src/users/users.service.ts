@@ -19,6 +19,8 @@ export class UsersService {
 
   async createUser(@Body() createUserDto): Promise<UserDocument> {
     createUserDto.username = createUserDto.email;
+    createUserDto.profilePic =
+      'https://res.cloudinary.com/thesudeshdas/image/upload/v1710683335/catalyst-2/user-avatar-default-bg_zhvozj.png';
 
     const createdUser = await this.userModel.create(createUserDto);
 
