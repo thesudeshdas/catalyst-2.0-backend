@@ -35,6 +35,9 @@ export class Powst {
   @Prop()
   imageAlt: string;
 
+  @Prop()
+  keywords: string[];
+
   @Prop({
     type: SchemaTypes.ObjectId,
     required: [true, 'Powst can not be created without a valid userId'],
