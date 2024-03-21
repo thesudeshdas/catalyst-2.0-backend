@@ -1,4 +1,9 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Powst, PowstDocument } from 'src/schema/powst.schema';
@@ -42,6 +47,50 @@ export class PowstService {
       .exec();
   }
 
+  async findById(powstId: string): Promise<PowstDocument> {
+    return this.powstModel.findById(powstId).populate('owner', userPopulation);
+  }
+
+  async likePowst(powstId: string, userId: string) {
+    const findPowst = await this.powstModel.findById(powstId);
+
+    if (!findPowst) {
+      throw new NotFoundException(
+        'The powst you are trying to like does not exist',
+      );
+    }
+
+    if (findPowst?.likedBy?.includes(userId)) {
+      throw new ConflictException('The powst is already liked by this user');
+    }
+
+    return this.powstModel.findByIdAndUpdate(
+      powstId,
+      { $inc: { noOfLikes: 1 }, $addToSet: { likedBy: userId } },
+      { new: true },
+    );
+  }
+
+  async unlikePowst(powstId: string, userId: string) {
+    const findPowst = await this.powstModel.findById(powstId);
+
+    if (!findPowst) {
+      throw new NotFoundException(
+        'The powst you are trying to unlike does not exist',
+      );
+    }
+
+    if (!findPowst?.likedBy?.includes(userId)) {
+      throw new ConflictException('The powst is not yet liked by this user');
+    }
+
+    return this.powstModel.findByIdAndUpdate(
+      powstId,
+      { $inc: { noOfLikes: -1 }, $pull: { likedBy: userId } },
+      { new: true },
+    );
+  }
+
   private async uploadImageToCloudinary(image: Express.Multer.File) {
     const uploadedImage = await this.cloudinary.uploadImage(image);
 
@@ -59,6 +108,8 @@ export class PowstService {
     const createdPowst = await this.powstModel.create({
       ...createPowstDto,
       image: imageUrl,
+      noOfLikes: 0,
+      likedBy: [],
     });
 
     return createdPowst.save();

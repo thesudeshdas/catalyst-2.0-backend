@@ -44,6 +44,12 @@ export class Powst {
     ref: 'User',
   })
   owner: User;
+
+  @Prop()
+  noOfLikes: number;
+
+  @Prop()
+  likedBy: string[];
 }
 
 export const PowstSchema = SchemaFactory.createForClass(Powst);

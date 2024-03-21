@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -21,6 +22,12 @@ export class PowstController {
     return this.powstService.findAll();
   }
 
+  @Public()
+  @Get('/:powstId')
+  getPowstDetails(@Param('powstId') powstId: string): Promise<PowstDocument> {
+    return this.powstService.findById(powstId);
+  }
+
   @Post()
   @UseInterceptors(FileInterceptor('image'))
   createPowst(
@@ -28,6 +35,21 @@ export class PowstController {
     @UploadedFile() image: Express.Multer.File,
   ): Promise<PowstDocument> {
     return this.powstService.create(createPowstDto, image);
+  }
+
+  @Public()
+  @Post('/:powstId/like')
+  likePowst(@Param('powstId') powstId: string, @Body('userId') userId: string) {
+    return this.powstService.likePowst(powstId, userId);
+  }
+
+  @Public()
+  @Post('/:powstId/unlike')
+  unlikePowst(
+    @Param('powstId') powstId: string,
+    @Body('userId') userId: string,
+  ) {
+    return this.powstService.unlikePowst(powstId, userId);
   }
 }
 
