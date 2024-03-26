@@ -6,6 +6,12 @@ import { Module } from '@nestjs/common';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { PowstController } from './powst/powst.controller';
+import { PowstModule } from './powst/powst.module';
+import { BlogController } from './blog/blog.controller';
+import { BlogModule } from './blog/blog.module';
+import { WorkController } from './work/work.controller';
+import { WorkModule } from './work/work.module';
 
 @Module({
   imports: [
@@ -22,8 +28,11 @@ import { UsersModule } from './users/users.module';
     }),
     AuthModule,
     UsersModule,
+    PowstModule,
+    BlogModule,
+    WorkModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, PowstController, BlogController, WorkController],
   providers: [AppService],
 })
 export class AppModule {}

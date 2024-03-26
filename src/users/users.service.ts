@@ -1,44 +1,138 @@
-import { Body, Injectable, NotFoundException } from '@nestjs/common';
+import { Body, HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from 'src/schema/users.schema';
-import { RegisterUserDto } from 'src/auth/auth.dto';
-import { sanitiseAllUsers, sanitiseUser } from 'src/utils/sanitiseSchema.utils';
+import { User, UserDocument } from 'src/schema/user.schema';
+import { UpdateUserDto } from './users.dto';
+import { CloudinaryService } from 'src/infrastructure/cloudinary/cloudinary.service';
+
+const powstPopulation = '_id title image imageAlt owner description';
+const blogPopulation = '_id title link platform owner ';
+
+const removeTokenAndPassword = '-refreshToken -accessToken -password';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private cloudinary: CloudinaryService,
+  ) {}
 
-  async create(@Body() createUserDto: RegisterUserDto): Promise<User> {
+  async createUser(@Body() createUserDto): Promise<UserDocument> {
+    createUserDto.username = createUserDto.email;
+    createUserDto.profilePic =
+      'https://res.cloudinary.com/thesudeshdas/image/upload/v1710683335/catalyst-2/user-avatar-default-bg_zhvozj.png';
+
     const createdUser = await this.userModel.create(createUserDto);
 
     return createdUser.save();
   }
 
-  async findUserEmail(@Body() email: string): Promise<User> {
-    try {
-      const findUser = await this.userModel.findOne({ email: email });
+  async updateUser(
+    userId: string,
+    updateUserDto,
+    profilePic: Express.Multer.File,
+  ): Promise<UserDocument> {
+    const updateFields = profilePic
+      ? {
+          ...updateUserDto,
+          profilePic: await this.uploadImageToCloudinary(profilePic),
+        }
+      : { ...updateUserDto };
 
-      if (!findUser) {
-        // throw new NotFoundException('No user found using this email');
-        return null;
-      }
-
-      return sanitiseUser(findUser);
-
-      // return false;
-    } catch (error) {
-      throw new NotFoundException('No user found using this email');
-    }
+    return this.userModel
+      .findByIdAndUpdate(userId, updateFields, { new: true })
+      .populate([
+        {
+          path: 'powsts.powst',
+          select: powstPopulation,
+          options: { limit: 4 },
+        },
+        {
+          path: 'blogs.blog',
+          select: blogPopulation,
+          options: { limit: 4 },
+        },
+      ])
+      .select(removeTokenAndPassword)
+      .exec();
   }
 
-  async findAll(): Promise<User[]> {
-    try {
-      const findUser = await this.userModel.find().exec();
+  async findUserByEmail(@Body() email: string): Promise<UserDocument> {
+    return this.userModel.findOne({ email: email }).exec();
+  }
 
-      return sanitiseAllUsers(findUser);
-    } catch (error) {
-      throw new NotFoundException('Kuch nahi mila');
+  async findUsername(username: string) {
+    const foundUsername = await this.userModel.findOne({ username: username });
+
+    if (foundUsername) {
+      return {
+        success: false,
+        message: 'Username is already taken. Please try again',
+      };
     }
+    return {
+      success: true,
+      message: 'Username is available',
+    };
+  }
+
+  async updateRefreshToken(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserDocument> {
+    return this.userModel
+      .findByIdAndUpdate(id, updateUserDto, { new: true })
+      .exec();
+  }
+
+  async getPublicProfile(userId: string): Promise<UserDocument> {
+    return this.userModel
+      .findOne({ username: userId })
+      .select(removeTokenAndPassword)
+      .populate([
+        {
+          path: 'powsts.powst',
+          select: powstPopulation,
+          options: {
+            limit: 4,
+          },
+        },
+        {
+          path: 'blogs.blog',
+          select: blogPopulation,
+          options: {
+            limit: 4,
+          },
+        },
+      ])
+      .lean()
+      .exec();
+  }
+
+  async findPowstsByUser(userId: string) {
+    return this.userModel
+      .findOne({ username: userId })
+      .select('powsts')
+      .populate([
+        {
+          path: 'powsts.powst',
+          select: powstPopulation,
+        },
+      ])
+      .lean()
+      .exec();
+  }
+
+  private async uploadImageToCloudinary(image: Express.Multer.File) {
+    const uploadedImage = await this.cloudinary.uploadImage(image);
+
+    if (!uploadedImage?.secure_url) {
+      throw new HttpException(
+        'Something went wrong while uploading the image',
+        500,
+      );
+    }
+
+    return uploadedImage.secure_url;
   }
 }
