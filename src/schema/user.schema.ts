@@ -114,6 +114,22 @@ export class User {
     ],
   })
   works: { work: Work }[];
+
+  @Prop({
+    default: 0,
+  })
+  noOfFollowers: number;
+
+  @Prop({
+    default: 0,
+  })
+  noOfFollowings: number;
+
+  @Prop()
+  followers: string[];
+
+  @Prop()
+  followings: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
