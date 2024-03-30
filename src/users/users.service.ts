@@ -178,6 +178,36 @@ export class UsersService {
     };
   }
 
+  // Work with the assumption that the user is trying to unfollow another valid user.
+  async unfollowUser(userId: string, userToUnfollow: string) {
+    // update the user with the new following and decrease the number of followings
+    const newUpdatedUser = await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        $pull: { followings: userToUnfollow },
+        $inc: { noOfFollowings: -1 },
+      },
+      { new: true },
+    );
+
+    // update the followed user with the new follower and decrease the number of followers
+    await this.userModel.findByIdAndUpdate(
+      userToUnfollow,
+      {
+        $pull: { followers: userId },
+        $inc: { noOfFollowers: -1 },
+      },
+      { new: true },
+    );
+
+    return {
+      success: true,
+      message: 'Successfully followed',
+      noOfFollowings: newUpdatedUser.noOfFollowings,
+      followings: newUpdatedUser.followings,
+    };
+  }
+
   private async uploadImageToCloudinary(image: Express.Multer.File) {
     const uploadedImage = await this.cloudinary.uploadImage(image);
 

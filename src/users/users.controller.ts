@@ -70,6 +70,31 @@ export class UsersController {
       throw new BadRequestException('Your already follow this user');
     }
 
-    return this.usersService.followUser(userId, body.userToFollow);
+    return this.usersService.followUser(userId, userToFollow);
+  }
+
+  // Steps to unfollow
+  // step 1 => Check if the user is trying to unfollow themselves, if not, continue, otherwise throw error
+  // step 2 => Check if the user whom is to be followed exist or not, if exists, continue, otherwise throw error
+  // step 3 => Check if the user is already following the user, if following, continue, otherwise throw error
+  // step 4 => All validation complete, unfollow the user, update both the users with the correct followings, followers, noOfFollowings, noOfFollowers data
+  @Public()
+  @Post('/:userId/unfollow')
+  async unfollowUser(@Request() req, @Param('userId') userId, @Body() body) {
+    const { userToUnFollow } = body;
+
+    if (userId === userToUnFollow) {
+      throw new BadRequestException('You can not unfollow yourself');
+    } else if (!(await this.usersService.findUserById(userToUnFollow))) {
+      throw new NotFoundException(
+        'The user you are trying to unfollow does not exist',
+      );
+    } else if (
+      !(await this.usersService.userAlreadyFollows(userId, userToUnFollow))
+    ) {
+      throw new BadRequestException('You do not follow the user yet');
+    }
+
+    return this.usersService.unfollowUser(userId, userToUnFollow);
   }
 }
