@@ -7,10 +7,11 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { UserDocument } from 'src/schema/user.schema';
-import { FileInterceptor } from '@nestjs/platform-express';
+
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {

@@ -1,9 +1,10 @@
 import { Body, HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User, UserDocument } from 'src/schema/user.schema';
-import { UpdateUserDto } from './users.dto';
 import { CloudinaryService } from 'src/infrastructure/cloudinary/cloudinary.service';
+import { User, UserDocument } from 'src/schema/user.schema';
+
+import { UpdateUserDto } from './users.dto';
 
 const powstPopulation = '_id title image imageAlt owner description';
 const blogPopulation = '_id title link platform owner ';

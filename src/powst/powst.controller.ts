@@ -7,10 +7,11 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { PowstService } from './powst.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { PowstDocument } from 'src/schema/powst.schema';
 import { Public } from 'src/auth/decorators/public.decorator';
+import { PowstDocument } from 'src/schema/powst.schema';
+
+import { PowstService } from './powst.service';
 
 @Controller('powst')
 export class PowstController {

@@ -1,7 +1,8 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { BlogService } from './blog.service';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { BlogDocument } from 'src/schema/blog.schema';
+
+import { BlogService } from './blog.service';
 
 @Controller('blog')
 export class BlogController {
