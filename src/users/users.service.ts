@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  Body,
-  HttpException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Body, HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
@@ -102,7 +96,7 @@ export class UsersService {
 
   async getPublicProfile(userId: string): Promise<UserDocument> {
     return this.userModel
-      .findOne({ username: userId })
+      .findById(userId)
       .select(removeTokenAndPassword)
       .populate([
         {
@@ -118,20 +112,6 @@ export class UsersService {
           options: {
             limit: 4,
           },
-        },
-      ])
-      .lean()
-      .exec();
-  }
-
-  async findPowstsByUser(userId: string) {
-    return this.userModel
-      .findOne({ username: userId })
-      .select('powsts')
-      .populate([
-        {
-          path: 'powsts.powst',
-          select: powstPopulation,
         },
       ])
       .lean()

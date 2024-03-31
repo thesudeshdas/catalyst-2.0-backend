@@ -39,6 +39,12 @@ export class PowstController {
   }
 
   @Public()
+  @Get('/:userId')
+  getAllUserPowsts(@Param('userId') userId) {
+    return this.powstService.findPowstsByUser(userId);
+  }
+
+  @Public()
   @Post('/:powstId/like')
   likePowst(@Param('powstId') powstId: string, @Body('userId') userId: string) {
     return this.powstService.likePowst(powstId, userId);

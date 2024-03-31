@@ -6,7 +6,10 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { userPopulation } from 'src/constants/population.constants';
+import {
+  powstPopulation,
+  userPopulation,
+} from 'src/constants/population.constants';
 import { CloudinaryService } from 'src/infrastructure/cloudinary/cloudinary.service';
 import { Powst, PowstDocument } from 'src/schema/powst.schema';
 import { User, UserDocument } from 'src/schema/user.schema';
@@ -49,6 +52,20 @@ export class PowstService {
 
   async findById(powstId: string): Promise<PowstDocument> {
     return this.powstModel.findById(powstId).populate('owner', userPopulation);
+  }
+
+  async findPowstsByUser(userId: string) {
+    return this.userModel
+      .findById(userId)
+      .select('powsts')
+      .populate([
+        {
+          path: 'powsts.powst',
+          select: powstPopulation,
+        },
+      ])
+      .lean()
+      .exec();
   }
 
   async likePowst(powstId: string, userId: string) {
