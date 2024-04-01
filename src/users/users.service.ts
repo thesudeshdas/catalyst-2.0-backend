@@ -10,6 +10,7 @@ import { CloudinaryService } from 'src/infrastructure/cloudinary/cloudinary.serv
 import { User, UserDocument } from 'src/schema/user.schema';
 
 import { UpdateUserDto } from './users.dto';
+import { IGetUserIdFromUsernameReturn } from './users.types';
 
 @Injectable()
 export class UsersService {
@@ -55,6 +56,16 @@ export class UsersService {
         },
       ])
       .select(removeTokenAndPassword)
+      .exec();
+  }
+
+  async getUserIdFromUsername(
+    username: string,
+  ): Promise<IGetUserIdFromUsernameReturn> {
+    return this.userModel
+      .findOne({ username: username })
+      .select('_id')
+      .lean()
       .exec();
   }
 

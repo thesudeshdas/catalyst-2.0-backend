@@ -15,10 +15,19 @@ import { Public } from 'src/auth/decorators/public.decorator';
 import { UserDocument } from 'src/schema/user.schema';
 
 import { UsersService } from './users.service';
+import { IGetUserIdFromUsernameReturn } from './users.types';
 
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
+
+  @Public()
+  @Get('/:username/get-id')
+  getUserIdFromUsername(
+    @Param('username') username,
+  ): Promise<IGetUserIdFromUsernameReturn> {
+    return this.usersService.getUserIdFromUsername(username);
+  }
 
   @Public()
   @Get('/:userId')
