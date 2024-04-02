@@ -7,10 +7,11 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { WorkService } from './work.service';
-import { WorkDocument } from 'src/schema/work.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Public } from 'src/auth/decorators/public.decorator';
+import { WorkDocument } from 'src/schema/work.schema';
+
+import { WorkService } from './work.service';
 
 @Controller('work')
 export class WorkController {

@@ -7,10 +7,11 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { PowstService } from './powst.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { PowstDocument } from 'src/schema/powst.schema';
 import { Public } from 'src/auth/decorators/public.decorator';
+import { PowstDocument } from 'src/schema/powst.schema';
+
+import { PowstService } from './powst.service';
 
 @Controller('powst')
 export class PowstController {
@@ -35,6 +36,12 @@ export class PowstController {
     @UploadedFile() image: Express.Multer.File,
   ): Promise<PowstDocument> {
     return this.powstService.create(createPowstDto, image);
+  }
+
+  @Public()
+  @Get('/:userId')
+  getAllUserPowsts(@Param('userId') userId) {
+    return this.powstService.findPowstsByUser(userId);
   }
 
   @Public()

@@ -7,13 +7,14 @@ import {
   Post,
   UsePipes,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { Public } from './decorators/public.decorator';
 import { UserDocument } from 'src/schema/user.schema';
-import { UsersService } from 'src/users/users.service';
-import { LoginUserDto, RefreshTokensDto, loginUserSchema } from './auth.dto';
-import { ZodValidationPipe } from 'src/utils/zodValidationPipe';
 import { RegisterUserDto, registerUserSchema } from 'src/users/users.dto';
+import { UsersService } from 'src/users/users.service';
+import { ZodValidationPipe } from 'src/utils/zodValidationPipe';
+
+import { Public } from './decorators/public.decorator';
+import { LoginUserDto, loginUserSchema, RefreshTokensDto } from './auth.dto';
+import { AuthService } from './auth.service';
 import { ILoginResponse, IRefreshTokenResponse } from './auth.types';
 
 @Controller('auth')

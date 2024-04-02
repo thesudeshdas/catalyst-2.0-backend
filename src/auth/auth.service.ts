@@ -6,11 +6,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from 'src/users/users.service';
-import { LoginUserDto } from './auth.dto';
-import { validatePassword } from 'src/utils/validatePassword';
 import * as bcrypt from 'bcrypt';
+import { UsersService } from 'src/users/users.service';
+import { validatePassword } from 'src/utils/validatePassword';
 
+import { LoginUserDto } from './auth.dto';
 // import types
 import { ILoginResponse, IRefreshTokenResponse } from './auth.types';
 

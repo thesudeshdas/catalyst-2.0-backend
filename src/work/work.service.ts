@@ -43,7 +43,7 @@ export class WorkService {
 
   async getAllUserWorks(userId: string) {
     return this.userModel
-      .findOne({ username: userId })
+      .findById(userId)
       .select('works')
       .populate('works.work');
   }

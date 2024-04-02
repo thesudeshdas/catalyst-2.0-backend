@@ -30,7 +30,7 @@ export class BlogService {
 
   async getAllUserBlogs(userId: string) {
     return this.userModel
-      .findOne({ username: userId })
+      .findById(userId)
       .select('blogs')
       .populate({
         path: 'blogs.blog',

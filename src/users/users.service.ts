@@ -1,14 +1,16 @@
 import { Body, HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User, UserDocument } from 'src/schema/user.schema';
-import { UpdateUserDto } from './users.dto';
+import {
+  blogPopulation,
+  powstPopulation,
+  removeTokenAndPassword,
+} from 'src/constants/population.constants';
 import { CloudinaryService } from 'src/infrastructure/cloudinary/cloudinary.service';
+import { User, UserDocument } from 'src/schema/user.schema';
 
-const powstPopulation = '_id title image imageAlt owner description';
-const blogPopulation = '_id title link platform owner ';
-
-const removeTokenAndPassword = '-refreshToken -accessToken -password';
+import { UpdateUserDto } from './users.dto';
+import { IGetUserIdFromUsernameReturn } from './users.types';
 
 @Injectable()
 export class UsersService {
@@ -57,6 +59,24 @@ export class UsersService {
       .exec();
   }
 
+  async getUserIdFromUsername(
+    username: string,
+  ): Promise<IGetUserIdFromUsernameReturn> {
+    return this.userModel
+      .findOne({ username: username })
+      .select('_id')
+      .lean()
+      .exec();
+  }
+
+  async findUserById(userId: string): Promise<UserDocument> {
+    return this.userModel
+      .findById(userId)
+      .select(removeTokenAndPassword)
+      .lean()
+      .exec();
+  }
+
   async findUserByEmail(@Body() email: string): Promise<UserDocument> {
     return this.userModel.findOne({ email: email }).exec();
   }
@@ -87,7 +107,7 @@ export class UsersService {
 
   async getPublicProfile(userId: string): Promise<UserDocument> {
     return this.userModel
-      .findOne({ username: userId })
+      .findById(userId)
       .select(removeTokenAndPassword)
       .populate([
         {
@@ -109,18 +129,74 @@ export class UsersService {
       .exec();
   }
 
-  async findPowstsByUser(userId: string) {
-    return this.userModel
-      .findOne({ username: userId })
-      .select('powsts')
-      .populate([
-        {
-          path: 'powsts.powst',
-          select: powstPopulation,
-        },
-      ])
-      .lean()
-      .exec();
+  // Checks if the user follows the other user. Assume that both the user are valid and the different. Return true if the follower follows the following, otherwise false.
+  async userAlreadyFollows(
+    follower: string,
+    following: string,
+  ): Promise<boolean> {
+    const followerUser = await this.findUserById(follower);
+
+    return followerUser.followings.includes(following);
+  }
+
+  // Work with the assumption that the user is trying to follow another valid user. All the checks for the same user following the same user, if the user already follows the user, etc should be managed by the controller
+  async followUser(userId: string, userToFollow: string) {
+    // update the user with the new following and increase the number of followings
+    const newUpdatedUser = await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        $push: { followings: userToFollow },
+        $inc: { noOfFollowings: 1 },
+      },
+      { new: true },
+    );
+
+    // update the followed user with the new follower and increase the number of followers
+    await this.userModel.findByIdAndUpdate(
+      userToFollow,
+      {
+        $push: { followers: userId },
+        $inc: { noOfFollowers: 1 },
+      },
+      { new: true },
+    );
+
+    return {
+      success: true,
+      message: 'Successfully followed',
+      noOfFollowings: newUpdatedUser.noOfFollowings,
+      followings: newUpdatedUser.followings,
+    };
+  }
+
+  // Work with the assumption that the user is trying to unfollow another valid user.
+  async unfollowUser(userId: string, userToUnfollow: string) {
+    // update the user with the new following and decrease the number of followings
+    const newUpdatedUser = await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        $pull: { followings: userToUnfollow },
+        $inc: { noOfFollowings: -1 },
+      },
+      { new: true },
+    );
+
+    // update the followed user with the new follower and decrease the number of followers
+    await this.userModel.findByIdAndUpdate(
+      userToUnfollow,
+      {
+        $pull: { followers: userId },
+        $inc: { noOfFollowers: -1 },
+      },
+      { new: true },
+    );
+
+    return {
+      success: true,
+      message: 'Successfully followed',
+      noOfFollowings: newUpdatedUser.noOfFollowings,
+      followings: newUpdatedUser.followings,
+    };
   }
 
   private async uploadImageToCloudinary(image: Express.Multer.File) {
